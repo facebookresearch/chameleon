@@ -1,0 +1,412 @@
+/* Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the Chameleon License found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --tab-radius: 5px;
+  --rounded-box: 5px;
+  --rounded-btn: 5px;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+@layer base {
+  @font-face {
+    font-family: "Optimistic Display";
+    src:
+      url(/fonts/optimistic/Optimistic_Display_W_Md.woff2) format("woff2"),
+      url(/fonts/optimistic/Optimistic_Display_W_Md.woff) format("woff");
+    font-weight: 500;
+  }
+
+  @font-face {
+    font-family: "Optimistic Display";
+    src:
+      url(/fonts/optimistic/Optimistic_Display_W_SBd.woff2) format("woff2"),
+      url(/fonts/optimistic/Optimistic_Display_W_SBd.woff) format("woff");
+    font-weight: 600;
+  }
+
+  @font-face {
+    font-family: "Optimistic Display";
+    src:
+      url(/fonts/optimistic/Optimistic_Display_W_Bd.woff2) format("woff2"),
+      url(/fonts/optimistic/Optimistic_Display_W_Bd.woff) format("woff");
+    font-weight: 700;
+  }
+
+  @font-face {
+    font-family: "Optimistic Text";
+    src:
+      url(/fonts/optimistic/Optimistic_Text_W_Rg.woff2) format("woff2"),
+      url(/fonts/optimistic/Optimistic_Text_W_Rg.woff) format("woff");
+    font-weight: 400;
+  }
+
+  @font-face {
+    font-family: "Optimistic Text";
+    src:
+      url(/fonts/optimistic/Optimistic_Text_W_Md.woff2) format("woff2"),
+      url(/fonts/optimistic/Optimistic_Text_W_Md.woff) format("woff");
+    font-weight: 500;
+  }
+
+  @font-face {
+    font-family: "Optimistic Text";
+    src:
+      url(/fonts/optimistic/Optimistic_Text_W_Bd.woff2) format("woff2"),
+      url(/fonts/optimistic/Optimistic_Text_W_Bd.woff) format("woff");
+    font-weight: 700;
+  }
+
+  @font-face {
+    font-family: "Optimistic Text";
+    src:
+      url(/fonts/optimistic/Optimistic_Text_W_XBd.woff2) format("woff2"),
+      url(/fonts/optimistic/Optimistic_Text_W_XBd.woff) format("woff");
+    font-weight: 800;
+  }
+
+  body {
+    font-family: "Optimistic Text", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #465a69;
+  }
+
+  /* Base (mobile) typography, overriding tailwind typography (.prose) defatuls */
+  /* Also review the theme in tailwind.config.js */
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Optimistic Display", sans-serif;
+  }
+
+  h4,
+  h5,
+  h6,
+  p {
+    max-width: 65ch;
+  }
+
+  .prose .display h1 {
+    @apply text-4xl font-medium leading-tight;
+  }
+
+  .prose .display h2 {
+    @apply font-medium leading-tight;
+    font-size: 2.5rem;
+  }
+
+  .prose h1 {
+    @apply mt-2 mb-4 text-3xl font-medium leading-tight;
+    letter-spacing: 0.016rem;
+  }
+
+  .prose h2 {
+    @apply my-2 text-2xl font-medium leading-tight;
+    letter-spacing: 0.01rem;
+  }
+
+  .prose h3 {
+    @apply my-2 text-xl font-medium leading-tight;
+    letter-spacing: 0.005rem;
+  }
+
+  .prose h4 {
+    @apply my-2 text-lg font-medium leading-tight;
+  }
+
+  .prose h5 {
+    @apply my-2 text-xl font-normal leading-normal;
+    letter-spacing: 0.005rem;
+  }
+
+  .prose h6 {
+    @apply my-2 text-base font-normal leading-normal;
+  }
+
+  .prose p {
+    @apply text-sm font-normal leading-normal;
+  }
+
+  .prose ol,
+  .prose ul {
+    @apply text-sm font-normal leading-normal;
+    padding-right: 2rem;
+  }
+
+  .prose a:not(.not-prose a) {
+    @apply inline-block no-underline;
+    border-bottom: 1px solid #0064e0;
+  }
+
+  .prose a:not(.not-prose a):hover,
+  .prose a:not(.not-prose a):active {
+    color: #0064e0;
+  }
+
+  .prose a:not(.not-prose a):focus {
+    @apply rounded-sm;
+    outline: none;
+    border-color: transparent;
+    box-shadow:
+      0 0 0 1px #0064e0,
+      0 0 4px #0064e0;
+  }
+
+  a.no-style,
+  a.no-style:hover,
+  a.no-style:active,
+  a.no-style:focus {
+    color: unset;
+    border: none;
+    text-decoration: none;
+  }
+
+  /* Non-mobile typography */
+  @media screen(lg) {
+    .prose .display h1 {
+      @apply text-6xl;
+    }
+
+    .prose .display h2 {
+      @apply text-5xl;
+    }
+
+    .prose h1 {
+      @apply text-4xl;
+    }
+
+    .prose h2 {
+      @apply text-3xl;
+    }
+
+    .prose h3 {
+      @apply text-2xl;
+    }
+
+    .prose h4 {
+      @apply text-lg text-gray-800;
+    }
+
+    .prose h5 {
+      @apply text-2xl;
+    }
+
+    .prose h6 {
+      @apply text-base;
+    }
+
+    .prose p {
+      @apply text-base;
+    }
+
+    .prose .medium {
+      @apply text-sm;
+    }
+
+    .prose ol,
+    .prose ul {
+      @apply text-base;
+      padding-right: 3rem;
+    }
+  }
+
+  .dark-mode h1,
+  .dark-mode h2,
+  .dark-mode h3,
+  .dark-mode h4,
+  .dark-mode h5,
+  ≈ {
+    @apply text-white;
+  }
+
+  .dark-mode h4,
+  .dark-mode h6 {
+    @apply text-gray-200;
+  }
+
+  code {
+    font-family: Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    display: inline-block;
+    background-color: #e5e7e9;
+    padding: 0px 6px;
+    border-radius: 4px;
+  }
+
+  .prose code:not(.not-prose code) {
+    @apply inline py-1 text-xs font-semibold break-all whitespace-pre-wrap;
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .prose code:not(.not-prose code)::before,
+  .prose code:not(.not-prose code)::after {
+    content: none;
+  }
+
+  pre {
+    max-width: 75vw;
+  }
+
+  pre code {
+    @apply inline-block;
+    word-break: inherit;
+  }
+
+  .prose blockquote {
+    @apply font-normal text-gray-600 opacity-80;
+  }
+}
+
+/**
+ * Custom CSS classes
+ */
+
+.landing-page th {
+  background-color: #f1f4f7;
+}
+
+.landing-page th,
+.landing-page td {
+  padding: 5px 10px;
+}
+
+.prose .chat-row p {
+  margin-top: 0;
+}
+
+.markdown td,
+.markdown th {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  padding: 5px;
+}
+
+.markdown th {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.markdown table {
+  margin: 20px 0;
+}
+
+.markdown h1 {
+  font-size: 2.5em;
+  font-weight: 600;
+}
+
+.markdown h2 {
+  font-size: 2em;
+  font-weight: 500;
+}
+
+.markdown h3 {
+  font-size: 1.5em;
+  font-weight: 500;
+}
+
+.markdown h4 {
+  font-size: 1.2em;
+  font-weight: 500;
+}
+
+.markdown h5 {
+  font-weight: 500;
+}
+
+.btn {
+  @apply normal-case;
+}
+
+.justify-start-only {
+  justify-content: start;
+}
+
+.prose .text-white * {
+  color: #fff;
+}
+
+.prose .text-white code {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.comp_button * {
+  margin: 0;
+}
+
+.flex-grow-2 {
+  flex-grow: 2;
+}
+.flex-grow-3 {
+  flex-grow: 3;
+}
+.flex-grow-4 {
+  flex-grow: 4;
+}
+.flex-grow-5 {
+  flex-grow: 5;
+}
+.flex-grow-6 {
+  flex-grow: 6;
+}
+.flex-grow-7 {
+  flex-grow: 7;
+}
+.flex-grow-8 {
+  flex-grow: 8;
+}
+.flex-grow-9 {
+  flex-grow: 9;
+}
+.flex-grow-10 {
+  flex-grow: 10;
+}
+
+/* Custom audio player */
+.audio-range input[type="range"] {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  appearance: none;
+  @apply w-full bg-transparent cursor-pointer;
+}
+
+.audio-range input[type="range"]::-webkit-slider-runnable-track {
+  @apply h-1;
+}
+
+.audio-range input[type="range"]::-moz-range-track {
+  @apply h-1;
+}
+
+.audio-range input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  @apply w-1 h-1 bg-transparent;
+}
+
+.audio-range input[type="range"]::-moz-range-thumb {
+  border: none;
+  border-radius: 0;
+  @apply w-1 h-1 bg-transparent;
+}

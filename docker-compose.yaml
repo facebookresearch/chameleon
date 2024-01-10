@@ -1,0 +1,30 @@
+version: '3.3'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: ./viewer_frontend.dockerfile
+    ports:
+      - "7654:7654"
+  model-viewer-service:
+    build:
+      context: .
+      dockerfile: ./viewer_backend.dockerfile
+    volumes:
+      - ./data:/data
+    ports:
+      - "7102:7102"
+    ipc: host
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [ gpu ]
+    command: ["python", "-m", "chameleon.viewer.backend.model_viewer"]
+  redis:
+    image: "redis:alpine"

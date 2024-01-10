@@ -1,0 +1,406 @@
+<!-- Copyright (c) Meta Platforms, Inc. and affiliates. -->
+
+<!-- This source code is licensed under the Chameleon License found in the -->
+<!-- LICENSE file in the root directory of this source tree. -->
+<h1>
+  <div id="connection-status"></div>
+  MiniViewer:
+</h1>
+<div class="container">
+  <div class="sidebar with-padding">
+    <h4>Input Controls</h4>
+    <div class="input-controls-container">
+      <button class="button" onclick="addInput('text')">Add text input</button>
+      <button class="button" onclick="addInput('image')">
+        Add image input
+      </button>
+      <button class="button" onclick="addInput('<END-OF-TURN>')">
+        Add end-of-turn token
+      </button>
+    </div>
+    <hr />
+    <h4>General Options</h4>
+    <div class="option">
+      <label for="seed">seed</label>
+      <input type="number" id="seed" value="0" />
+    </div>
+    <div class="option">
+      <label for="max-seq-len">max sequence length</label>
+      <input type="number" id="max-seq-len" value="4096" />
+    </div>
+    <div class="option">
+      <label for="max-gen-len">max generation length</label>
+      <input type="number" id="max-gen-len" value="4096" />
+    </div>
+    <h4>
+      <input type="checkbox" id="enable-text" name="enable-text" checked />
+      <label for="enable-text">Text Decoder Options</label>
+    </h4>
+    <div class="option">
+      <label for="text-rep-penalty">repetition penalty</label>
+      <input type="number" id="text-rep-penalty" value="1.2" step="0.01" />
+    </div>
+    <div class="option">
+      <label for="text-temp">temperature</label>
+      <input type="number" id="text-temp" value="0.7" step="0.01" />
+    </div>
+    <div class="option">
+      <label for="text-top-p">top-p</label>
+      <input type="number" id="text-top-p" value="0.9" step="0.01" />
+    </div>
+    <h4>
+      <input type="checkbox" id="enable-image" name="enable-image" checked />
+      <label for="enable-image">Image Decoder Options</label>
+    </h4>
+    <div class="option">
+      <label for="img-cfg-gstext">cfg text</label>
+      <input type="number" id="img-cfg-gstext" value="3.0" step="0.01" />
+    </div>
+    <div class="option">
+      <label for="img-cfg-gsimage">cfg image</label>
+      <input type="number" id="img-cfg-gsimage" value="1.2" step="0.01" />
+    </div>
+    <div class="option">
+      <label for="img-temp">temperature</label>
+      <input type="number" id="img-temp" value="0.7" step="0.01" />
+    </div>
+    <div class="option">
+      <label for="img-top-p">top-p</label>
+      <input type="number" id="img-top-p" value="0.9" step="0.01" />
+    </div>
+  </div>
+  <div class="content with-padding">
+    <div class="input-wrapper">
+      Inputs:
+      <div id="inputs" class="with-padding"></div>
+    </div>
+    <h4>
+      <button id="generate" class="button" onclick="generate()">
+        Generate
+      </button>
+      <button
+        id="cancel"
+        class="button"
+        onclick="cancel()"
+        style="display: none"
+      >
+        Cancel
+      </button>
+    </h4>
+    Results:
+    <pre id="results" class="with-padding"></pre>
+    <div id="timing" class="with-padding"></div>
+    <div id="queue" class="with-padding"></div>
+  </div>
+</div>
+
+<style>
+  .container {
+    display: inline-flex;
+  }
+
+  .sidebar {
+    flex: 0 0 200px;
+    border-right: 2px solid #ddd;
+  }
+
+  #connection-status {
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: grey;
+    display: inline-block;
+  }
+
+  .input-controls-container {
+    display: inline-grid;
+  }
+
+  .option {
+    display: flex;
+    margin-bottom: 5px;
+  }
+
+  .option label {
+    white-space: nowrap;
+    margin-right: 10px;
+  }
+
+  .option input {
+    flex-grow: 1;
+    text-align: right;
+  }
+
+  .content {
+    width: 100%;
+  }
+
+  .with-padding {
+    padding: 10px;
+  }
+
+  .input-wrapper {
+    border: dotted;
+  }
+
+  .input-container {
+    display: flex;
+    align-items: center;
+  }
+
+  .input-controls {
+    display: inline-flex;
+    padding: 2px;
+  }
+
+  #results {
+    background: lightgray;
+  }
+
+  button {
+    text-align: left;
+  }
+
+  img {
+    width: 200px;
+    height: 200px;
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.0/socket.io.min.js"></script>
+<script>
+  var active_key;
+  var socket;
+
+  function createButton(text, onClick) {
+    var button = document.createElement("button");
+    button.textContent = text;
+    button.onclick = onClick;
+    return button;
+  }
+
+  function removeInput(evt) {
+    var inputWrapper = evt.target.parentNode.parentNode;
+    inputWrapper.parentNode.removeChild(inputWrapper);
+  }
+
+  function moveInputUp(evt) {
+    var inputWrapper = evt.target.parentNode.parentNode;
+    var prev = inputWrapper.previousElementSibling;
+    if (prev) {
+      inputWrapper.parentNode.insertBefore(inputWrapper, prev);
+    }
+  }
+
+  function moveInputDown(evt) {
+    var inputWrapper = evt.target.parentNode.parentNode;
+    var next = inputWrapper.nextElementSibling;
+    if (next) {
+      inputWrapper.parentNode.insertBefore(next, inputWrapper);
+    }
+  }
+
+  function readFileAsync(file) {
+    return new Promise((resolve, reject) => {
+      let reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function loadImageSource(dataTransfer) {
+    if (dataTransfer.files.length > 0) {
+      return await readFileAsync(dataTransfer.files[0]);
+    }
+
+    let htmlContent = dataTransfer.getData("text/html");
+    if (htmlContent) {
+      const div = document.createElement("div");
+      div.innerHTML = htmlContent;
+      return div.querySelector("img").src;
+    }
+
+    return (
+      dataTransfer.getData("text/uri-list") ||
+      dataTransfer.getData("text/plain")
+    );
+  }
+
+  async function showPreview(evt) {
+    var wrapper = evt.target.parentElement;
+    wrapper.querySelector("img").src = await loadImageSource(evt.target);
+    wrapper.querySelector("img").style.display = "block";
+    wrapper.querySelector("p").style.display = "none";
+  }
+
+  async function handleDrop(evt) {
+    evt.preventDefault();
+    var wrapper = evt.target.parentElement;
+    wrapper.querySelector("img").src = await loadImageSource(evt.dataTransfer);
+    wrapper.querySelector("img").style.display = "block";
+    wrapper.querySelector("p").style.display = "none";
+  }
+
+  function addInput(input_kind) {
+    var inputs_div = document.getElementById("inputs");
+    var wrapper = document.createElement("div");
+    wrapper.kind = input_kind;
+    wrapper.className = "input-container";
+
+    var new_inputs = [];
+    if (input_kind === "text") {
+      new_inputs.push(document.createElement("textarea"));
+    } else if (input_kind === "image") {
+      wrapper.setAttribute("draggable", true);
+      wrapper.ondragover = (evt) => evt.preventDefault();
+      wrapper.ondrop = handleDrop;
+
+      var hiddenImageFromFile = document.createElement("input");
+      hiddenImageFromFile.type = "file";
+      hiddenImageFromFile.accept = "image/*";
+      hiddenImageFromFile.addEventListener("change", showPreview);
+      hiddenImageFromFile.style.display = "none";
+      wrapper.onclick = function () {
+        hiddenImageFromFile.click();
+      };
+      new_inputs.push(hiddenImageFromFile);
+
+      var description = document.createElement("p");
+      description.textContent =
+        "Drag and drop your image here, or click to select.";
+      new_inputs.push(description);
+
+      var preview = document.createElement("img");
+      preview.style.display = "none";
+      new_inputs.push(preview);
+    } else {
+      var span = document.createElement("span");
+      span.textContent = input_kind;
+      new_inputs.push(span);
+    }
+
+    const input_controls = document.createElement("div");
+    input_controls.className = "input-controls";
+    input_controls.appendChild(createButton("-", removeInput));
+    input_controls.appendChild(createButton("↓", moveInputDown));
+    input_controls.appendChild(createButton("↑", moveInputUp));
+
+    wrapper.appendChild(input_controls);
+    for (var new_input of new_inputs) {
+      wrapper.appendChild(new_input);
+    }
+    wrapper.appendChild(document.createElement("br"));
+
+    inputs_div.appendChild(wrapper);
+  }
+
+  async function generate() {
+    document.getElementById("generate").style.display = "none";
+    document.getElementById("cancel").style.display = "block";
+    document.getElementById("results").innerHTML = "";
+    document.getElementById("timing").innerHTML = "";
+    document.getElementById("queue").innerHTML = "";
+
+    active_key = `key_${Math.random()
+      .toString(36)
+      .substring(2, 11)}_${Date.now()}`;
+
+    const user_options = {};
+    for (const option of document.getElementsByClassName("option")) {
+      const input = option.querySelector("input");
+      user_options[input.id] = Number(input.value);
+    }
+
+    user_options["enable-text"] =
+      document.getElementById("enable-text").checked;
+    user_options["enable-image"] =
+      document.getElementById("enable-image").checked;
+
+    const user_inputs = [];
+    const inputs_div = document.getElementById("inputs");
+
+    const input_elems = Array.from(inputs_div.children).map((wrapper) =>
+      wrapper.querySelector("textarea, input, span")
+    );
+
+    const image_promises = Array.from(inputs_div.children)
+      .filter((wrapper) => wrapper.kind === "image")
+      .map((wrapper) => {
+        const file_input = wrapper.querySelector('input[type="file"]');
+        return file_input.files[0]
+          ? readFileAsync(file_input.files[0])
+          : Promise.resolve(null);
+      });
+
+    const images = await Promise.all(image_promises);
+
+    for (const wrapper of inputs_div.children) {
+      if (wrapper.kind === "text") {
+        user_inputs.push({
+          type: "text",
+          value: wrapper.querySelector("textarea").value,
+        });
+      } else if (wrapper.kind === "image") {
+        user_inputs.push({ type: "image", value: images.shift() });
+      } else {
+        user_inputs.push({ type: "sentinel", value: wrapper.kind });
+      }
+    }
+
+    socket.emit("generate", active_key, user_options, user_inputs);
+  }
+
+  function cancel() {
+    document.getElementById("generate").style.display = "block";
+    document.getElementById("cancel").style.display = "none";
+    document.getElementById("queue").innerHTML = "";
+    socket.emit("cancel", active_key);
+    active_key = null;
+  }
+
+  function connectSocket() {
+    socket = io();
+
+    socket.on("connect", function() {
+      document.getElementById("connection-status").style.backgroundColor = 'green';
+    });
+
+    socket.on("disconnect", function(reason) {
+      cancel();
+      document.getElementById("connection-status").style.backgroundColor = 'red';
+    });
+
+    socket.on("progress", function (data) {
+      if (data.key != active_key) {
+        return;
+      }
+
+      document.getElementById("queue").innerHTML = "";
+      if (data.type == "queue") {
+        document.getElementById(
+          "queue"
+        ).innerHTML = `queue position ${data.value}`;
+      }
+
+      if (data.type == "text") {
+        document.getElementById("results").innerHTML += data.value;
+      } else if (data.type == "image_start") {
+        document.getElementById("results").appendChild(new Image());
+      } else if (data.type == "image") {
+        document.getElementById("results").lastElementChild.src = data.value;
+      } else if (data.type == "image_end") {
+      } else if (data.type == "done") {
+        document.getElementById(
+          "timing"
+        ).innerHTML = `Generation time: ${data.value.toFixed(2)} sec`;
+        document.getElementById("generate").style.display = "block";
+        document.getElementById("cancel").style.display = "none";
+        active_key = null;
+      }
+    });
+  }
+
+  window.onload = (evt) => {
+    connectSocket();
+  };
+</script>

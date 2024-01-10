@@ -1,0 +1,23 @@
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+#
+# This source code is licensed under the Chameleon License found in the
+# LICENSE file in the root directory of this source tree.
+
+host: "0.0.0.0"
+port: 7102
+debug: true
+
+model_path: /data/models/7b/
+# model_path: /data/models/30b/
+
+tokenizer_path: /data/tokenizer/text_tokenizer.json
+additional_eos_tokens: ["<reserved08706>"]
+
+vqgan_config_path: /data/tokenizer/vqgan.yaml
+vqgan_ckpt_path: /data/tokenizer/vqgan.ckpt
+
+distributed:
+  master_address: "0.0.0.0"
+  master_port: 12332
+
+redis_port: 6379

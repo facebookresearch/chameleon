@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+preferred-citation:
+  type: article
+  title: 'Chameleon: Mixed-Modal Early-Fusion Foundation Models'
+  message: >-
+    If you use this software, please cite it using the
+    metadata from this file.
+  authors:
+    - name: Chameleon Team
+  doi: "10.48550/arXiv.2405.09818"
+  url: 'https://arxiv.org/abs/2405.09818'
+  journal: "arXiv preprint arXiv:2405.09818"
+  year: 2024
+  repository-code: 'https://github.com/facebookresearch/chameleon'
+  repository-artifact: >-
+    https://ai.meta.com/resources/models-and-libraries/chameleon-downloads/

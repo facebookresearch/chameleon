@@ -1,0 +1,35 @@
+# If black/isort/pytest change, then update `.circleci/config.yml`
+black==23.7.0
+isort==5.12.0
+pytest==7.4.0
+rich==13.5.*
+ipython
+
+# Do not change, python 3.11 needs this
+hydra-core==1.3.2
+typer==0.9.0
+httpx==0.24.1
+pylint==2.17.5
+submitit==1.4.2
+pudb==2022.1.3
+
+# These do/should match dependency versions
+# This is so that the viewer can run without any other deps outside of this file
+Pillow==10.0.*
+fastapi==0.101.1
+pydantic==1.10.*
+requests==2.31.*
+uvicorn==0.23.2
+python-multipart==0.0.6
+ruff==0.1.2
+websockets==12.0
+redis[hiredis]==5.0.1
+psutil==5.9.7 
+
+# For inference
+albumentations==1.3.1
+einops==0.7.0
+pytorch_lightning==2.1.2
+transformers==4.36.2
+xformers==0.0.23
+torchvision==0.16.*

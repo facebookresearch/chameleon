@@ -49,7 +49,7 @@ def download_model(presigned_url: str, target_folder: Path, model: str):
     if model == "7b":
         download_filenames += ["consolidated.pth"]
     elif model == "30b":
-        download_filenames += [f"consolidated.{i}.pth" for i in range(4)]
+        download_filenames += [f"consolidated.{i:02}.pth" for i in range(4)]
     else:
         print(f"Unknown model: {model}")
         sys.exit(1)

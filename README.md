@@ -7,13 +7,15 @@ This repository contains artifacts for the Meta Chameleon model from FAIR, Meta 
 - [Input-Output Viewing](./chameleon/viewer) — a harness for richly viewing multimodal model inputs and outputs with a browser-based tool
 - [Evaluation Prompts](./data) — mixed-modal and text-only prompts for human evaluation
 
-## System Requirements
+### System Requirements
 
 Running constituent components for inference and the input-output viewer currently requires a CUDA-capable GPU. If you'd like to run inference on other hardware, other inference implementations, including [HuggingFace](//huggingface.co/facebook/chameleon), are platform agnostic.
 
+## Getting Started
+
 First, pip install this repository:
 ```sh
-pip install git+https://github.com/fairinternal/chameleon.git
+pip install git+https://github.com/facebookresearch/chameleon.git
 ```
 
 If you want access to the full visualizer, you'll need to clone this repository, then pip install:

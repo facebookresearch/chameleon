@@ -9,7 +9,7 @@ We work with a third-party crowdsourcing vendor to collect a set of diverse and 
 After collecting an initial set of prompts, we ask three random annotators to evaluate whether the prompts are clear and whether they expect the responses to contain images. We use a majority vote to filter unclear prompts and prompts that don’t expect mixed-modal responses. In the end, our final evaluation set contains
 1,048 prompts: 441 (42.1%) are mixed-modal (i.e., containing both text and images), and the remaining 607 (57.9%) are text-only.
 
-More details on how these prompts are collected and some statistics can be found in the [paper](https://research.facebook.com/publications/).
+More details on how these prompts are collected and some statistics can be found in the [paper](https://arxiv.org/pdf/2405.09818).
 
 ## File format
 

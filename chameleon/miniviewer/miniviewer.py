@@ -10,6 +10,7 @@ import time
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 import click
 import torch
@@ -18,25 +19,29 @@ from flask_socketio import SocketIO
 
 from chameleon.inference.chameleon import ChameleonInferenceModel, Options, TokenManager
 
+# Constants
+IMAGE_YIELD_EVERY_N = 32
+MAX_BUFFER_SIZE = 16 * 1024 * 1024
+
 
 @dataclass
 class Request:
     room: str
     key: str
-    options: dict[str, int | float | bool]
-    prompt_ui: list[dict]
+    options: Dict[str, Union[int, float, bool]]
+    prompt_ui: List[Dict[str, Any]]
 
 
-def convert_options(ui_options: dict) -> Options:
+def convert_options(ui_options: Dict[str, Any]) -> Options:
     txt = None
-    if ui_options["enable-text"]:
+    if ui_options.get("enable-text"):
         txt = Options.Text(
             repetition_penalty=ui_options["text-rep-penalty"],
             temp=ui_options["text-temp"],
             top_p=ui_options["text-top-p"],
         )
     img = None
-    if ui_options["enable-image"]:
+    if ui_options.get("enable-image"):
         img = Options.Image(
             cfg=Options.Image.CFG(
                 guidance_scale_image=ui_options["img-cfg-gsimage"],
@@ -64,10 +69,10 @@ class UIDecoder:
         self.token_manager = token_manager
         self.state = UIDecoder.State.TXT
         self.image_builder = []
-        self.image_yield_every_n = 32
+        self.image_yield_every_n = IMAGE_YIELD_EVERY_N
         self.image_has_updated = False
 
-    def _image_progress(self) -> dict:
+    def _image_progress(self) -> Dict[str, str]:
         self.image_has_updated = False
         png = self.token_manager.png_from_bpe_tokens(torch.cat(self.image_builder))
         return {
@@ -75,7 +80,7 @@ class UIDecoder:
             "value": "data:image/png;base64," + base64.b64encode(png).decode(),
         }
 
-    def next(self, gpu_token: torch.LongTensor) -> dict | None:
+    def next(self, gpu_token: torch.LongTensor) -> Optional[Dict[str, Any]]:
         if self.state == UIDecoder.State.TXT:
             cpu_tok = gpu_token.item()
 
@@ -97,7 +102,6 @@ class UIDecoder:
                 return self._image_progress()
 
         elif self.state == UIDecoder.State.IMG_END:
-            # assert gpu_token == end_image
             self.state = UIDecoder.State.TXT
             progress = self._image_progress() if self.image_has_updated else None
             self.image_builder = []
@@ -106,23 +110,22 @@ class UIDecoder:
 
 @dataclass
 class State:
-    room_keys: dict[str, set[str]]
-    pending_requests: list[Request]
+    room_keys: Dict[str, set]
+    pending_requests: List[Request]
     cond: threading.Condition
 
-    def __enter__(self, *args, **kwargs):
-        self.cond.__enter__(*args, **kwargs)
+    def __enter__(self):
+        self.cond.__enter__()
         return self
 
-    def __exit__(self, *args, **kwargs):
-        self.cond.__exit__(*args, **kwargs)
-        return self
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.cond.__exit__(exc_type, exc_value, traceback)
 
 
 GlobalState = State(room_keys={}, pending_requests=[], cond=threading.Condition())
 
 app = Flask(__name__)
-socketio = SocketIO(app, max_http_buffer_size=16 * 1024 * 1024)
+socketio = SocketIO(app, max_http_buffer_size=MAX_BUFFER_SIZE)
 
 
 @app.route("/")
@@ -134,19 +137,13 @@ def index():
 @socketio.on("disconnect")
 def handle_disconnect():
     with GlobalState as state:
-        try:
-            del state.room_keys[request.sid]
-        except KeyError:
-            pass
+        state.room_keys.pop(request.sid, None)
 
 
 @socketio.on("cancel")
 def handle_cancel(key):
     with GlobalState as state:
-        try:
-            state.room_keys[request.sid].remove(key)
-        except KeyError:
-            pass
+        state.room_keys.get(request.sid, set()).discard(key)
 
 
 @socketio.on("generate")
@@ -173,42 +170,25 @@ def generation_thread(model: ChameleonInferenceModel):
             progress = ui_decoder.next(
                 torch.tensor([model.token_manager.vocab.begin_image])
             )
-            socketio.emit(
-                "progress",
-                {"key": req.key, **progress},
-                room=req.room,
-            )
+            socketio.emit("progress", {"key": req.key, **progress}, room=req.room)
 
-        for token in model.stream(
-            prompt_ui=req.prompt_ui,
-            options=options,
-        ):
+        for token in model.stream(prompt_ui=req.prompt_ui, options=options):
             with GlobalState as state:
-                if req.key not in state.room_keys.get(req.room, {}):
+                if req.key not in state.room_keys.get(req.room, set()):
                     break
 
             if progress := ui_decoder.next(token.id):
-                socketio.emit(
-                    "progress",
-                    {"key": req.key, **progress},
-                    room=req.room,
-                )
+                socketio.emit("progress", {"key": req.key, **progress}, room=req.room)
 
         timing = time.time() - start
-        socketio.emit(
-            "progress",
-            {"key": req.key, "type": "done", "value": timing},
-            room=req.room,
-        )
+        socketio.emit("progress", {"key": req.key, "type": "done", "value": timing}, room=req.room)
 
 
 def queue_position_thread():
     local_pending_requests = []
     while True:
         with GlobalState as state:
-            state.cond.wait_for(
-                lambda: local_pending_requests != state.pending_requests
-            )
+            state.cond.wait_for(lambda: local_pending_requests != state.pending_requests)
             local_pending_requests = state.pending_requests[:]
 
         for i, req in enumerate(local_pending_requests):
@@ -222,9 +202,7 @@ def queue_position_thread():
 
 @click.command()
 @click.option("--data-path", type=click.Path(), default="./data")
-@click.option(
-    "--model-size", type=click.Choice(["7b", "30b"], case_sensitive=False), default="7b"
-)
+@click.option("--model-size", type=click.Choice(["7b", "30b"], case_sensitive=False), default="7b")
 def main(data_path, model_size):
     data_path = Path(data_path)
 
@@ -234,18 +212,12 @@ def main(data_path, model_size):
     vqgan_ckpt_path = str(data_path / "tokenizer/vqgan.ckpt")
 
     if not os.path.exists(model_path):
-        raise ValueError(
-            "Model not found. Did you run python -m chameleon.download_data {PRESIGNED_URL}"
-        )
+        raise ValueError("Model not found. Did you run python -m chameleon.download_data {PRESIGNED_URL}")
 
     cm3v2_inference_model = ChameleonInferenceModel(
         model_path, tokenizer_path, vqgan_cfg_path, vqgan_ckpt_path
     )
-    threading.Thread(
-        target=generation_thread,
-        args=(cm3v2_inference_model,),
-        daemon=True,
-    ).start()
+    threading.Thread(target=generation_thread, args=(cm3v2_inference_model,), daemon=True).start()
     threading.Thread(target=queue_position_thread, daemon=True).start()
     socketio.run(app, debug=False)
 

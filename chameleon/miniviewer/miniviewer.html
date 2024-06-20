@@ -236,6 +236,9 @@
   async function handleDrop(evt) {
     evt.preventDefault();
     var wrapper = evt.target.parentElement;
+    var file = evt.dataTransfer.files[0];
+    var fileInput = wrapper.querySelector('input[type="file"]');
+    fileInput.files = evt.dataTransfer.files;
     wrapper.querySelector("img").src = await loadImageSource(evt.dataTransfer);
     wrapper.querySelector("img").style.display = "block";
     wrapper.querySelector("p").style.display = "none";

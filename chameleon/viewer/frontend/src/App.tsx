@@ -8,24 +8,39 @@ import { Route, Routes } from "react-router-dom";
 
 import { GenerateMixedModal } from "./components/pages/GenerateMixedModal";
 
-import { BasicNavbar } from "./components/ri-components/navbars/BasicNavbar";
+import { BasicNavbar, NavContent } from "./components/ri-components/navbars/BasicNavbar";
 
 // JSON Viewer specific css
 import "react18-json-view/src/style.css";
 
 function App() {
+  const navContent: NavContent = {
+    title: "Chameleon",
+    description: "Model Input/Output Viewer",
+    githubLink: "https://github.com/facebookresearch/chameleon",
+    showHomeLink: true,
+    navItems: [
+      {
+        id: "paper-item",
+        url: "https://arxiv.org/abs/2405.09818",
+        title: "Discover how it works",
+        showArrowIcon: true,
+      },
+    ],
+  };
+
   return (
     <div>
       <BasicNavbar
-        content={{title: "Chameleon", description: "Model Input/Output Viewer"}}
+        content={navContent}
       />
 
       <Routes>
         <Route index path="*" element={
-            <div className="relative lg:px-12 px-5 flex flex-col">
-              <GenerateMixedModal />
-            </div>
-          }
+          <div className="relative lg:px-12 px-5 flex flex-col">
+            <GenerateMixedModal />
+          </div>
+        }
         />
       </Routes>
     </div>

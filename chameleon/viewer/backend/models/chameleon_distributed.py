@@ -20,8 +20,9 @@ import redis.asyncio as async_redis
 import torch
 from tokenizers import Tokenizer
 
-from chameleon.inference.vocab import VocabInfo
 from chameleon.inference.image_tokenizer import ImageTokenizer
+from chameleon.inference.loader import load_model
+from chameleon.inference.vocab import VocabInfo
 from chameleon.viewer.backend.data_types import WSMessageType
 from chameleon.viewer.backend.models.abstract_model import (
     DEFAULT_IMAGE_CFG_IMAGE,
@@ -32,9 +33,11 @@ from chameleon.viewer.backend.models.abstract_model import (
     MixedSequenceType,
     StreamingImage,
 )
-from chameleon.viewer.backend.models.chameleon_local import ChameleonForwardMixin, ChameleonTokenizationMixin
+from chameleon.viewer.backend.models.chameleon_local import (
+    ChameleonForwardMixin,
+    ChameleonTokenizationMixin,
+)
 from chameleon.viewer.backend.utils import get_logger
-from chameleon.inference.loader import load_model
 
 logger = get_logger(__name__)
 

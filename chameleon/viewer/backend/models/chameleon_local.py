@@ -20,6 +20,8 @@ from transformers import (
 
 from chameleon.inference.alignment import AlignPromptRight
 from chameleon.inference.generation import ChameleonGenerator
+from chameleon.inference.image_tokenizer import ImageTokenizer
+from chameleon.inference.loader import load_model
 from chameleon.inference.logits_processor import (
     AllowOnlyTokensAfterIndexLogitsProcessor,
     AllowOnlyTokensLogitsProcessor,
@@ -32,8 +34,6 @@ from chameleon.inference.token_selector import (
     ReplicatedInputTokenSelector,
 )
 from chameleon.inference.vocab import VocabInfo, VocabTranslation
-from chameleon.inference.loader import load_model
-from chameleon.inference.image_tokenizer import ImageTokenizer
 from chameleon.viewer.backend.models.abstract_model import (
     DEFAULT_IMAGE_CFG_IMAGE,
     DEFAULT_IMAGE_CFG_TEXT,

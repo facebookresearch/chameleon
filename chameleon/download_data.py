@@ -2,9 +2,9 @@
 # This software may be used and distributed according to the terms of the Chameleon License Agreement.
 
 import hashlib
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 
 def download_file(url: str, output_path: Path):

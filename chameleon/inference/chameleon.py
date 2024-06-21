@@ -81,9 +81,9 @@ class Options:
     extra_eos_tokens: list[int | str] = field(default_factory=lambda: ["<racm3:break>"])
 
     def __post_init__(self):
-        if self.txt == True:
+        if self.txt is True:
             self.txt = Options.Text()
-        if self.img == True:
+        if self.img is True:
             self.img = Options.Image()
 
 
@@ -146,7 +146,7 @@ class TokenManager:
             if input_["type"] == "text":
                 tokens += self.tokenize_text(input_["value"])
             elif input_["type"] == "image":
-                if type(input_["value"]) == str:
+                if isinstance(input_["value"], str):
                     if input_["value"].startswith("data:"):
                         # Value Format: 'data:image/[^;]+;base64,[A-Za-z0-9+/]+={0,2}'
                         tokens += self.tokenize_b64img(input_["value"].split(",", 1)[1])
@@ -156,7 +156,7 @@ class TokenManager:
                         )
                     else:
                         raise ValueError("Unknown image format.")
-                elif type(input_["value"]) == Image:
+                elif isinstance(input_["value"], Image):
                     tokens += self.tokenize_image(input_["value"])
                 else:
                     raise ValueError("Unknown image type.")

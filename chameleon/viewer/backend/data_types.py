@@ -9,8 +9,6 @@ from typing import Literal
 from pydantic import BaseModel, Extra, Field
 
 from chameleon.viewer.backend.models.abstract_model import (
-    DEFAULT_IMAGE_CFG_IMAGE,
-    DEFAULT_IMAGE_CFG_TEXT,
     DEFAULT_MULTIMODAL_CFG_IMAGE,
     DEFAULT_MULTIMODAL_CFG_TEXT,
 )

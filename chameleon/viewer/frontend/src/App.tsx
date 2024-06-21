@@ -21,21 +21,10 @@ function App() {
     showHomeLink: true,
     navItems: [
       {
-        id: "item1",
-        url: "/item1",
-        title: "Item 1",
+        id: "paper-item",
+        url: "https://arxiv.org/abs/2405.09818",
+        title: "Discover how it works",
         showArrowIcon: true,
-      },
-      {
-        id: "item2",
-        url: "/item2",
-        title: "Item 2",
-        showArrowIcon: false,
-      },
-      {
-        id: "item3",
-        title: "Item 3 (No URL)",
-        showArrowIcon: false,
       },
     ],
   };

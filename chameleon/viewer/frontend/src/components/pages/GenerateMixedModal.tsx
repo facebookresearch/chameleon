@@ -250,8 +250,8 @@ export function GenerateMixedModal() {
       return (
         <>
           <div className="absolute top-4 left-4 z-0 select-none pointer-events-none opacity-50 prose">
-            You can edit text and drag/paste images in the input above. It's
-            just like writing a mini document.
+            You can edit text and drag/paste images in the input above.<br />
+            It's just like writing a mini document.
           </div>
         </>
       );
@@ -396,7 +396,7 @@ export function GenerateMixedModal() {
             className={`flex-1 flex flex-col relative overflow-x-hidden mb-10`}
           >
             <div
-              className={`flex-1 flex flex-row items-stretch gap-4 max-h-[calc(100vh-250px)] ${
+              className={`flex-1 flex flex-row items-stretch gap-4 max-h-[calc(100vh-200px)] ${
                 advancedMode ? "ml-[500px]" : "ml-0"
               } transition-all`}
             >
@@ -462,7 +462,7 @@ export function GenerateMixedModal() {
 
               {/* Results */}
 
-              <div className="flex-1 flex flex-col bg-gray-50 rounded-md overflow-x-hidden px-6 py-4 max-h-[calc(100vh-250px)] ">
+              <div className="flex-1 flex flex-col bg-gray-50 rounded-md overflow-x-hidden px-6 py-4 max-h-[calc(100vh-200px)] ">
                 <div className="prose">
                   <h4>Output</h4>
                 </div>
@@ -488,7 +488,7 @@ export function GenerateMixedModal() {
             {/* Side panel */}
 
             <div
-              className={`absolute top-0 bottom-11 w-[490px] max-h-[calc(100vh-250px)] rounded-md px-6 py-4 overflow-y-scroll ${
+              className={`absolute top-0 bottom-11 w-[490px] max-h-[calc(100vh-200px)] rounded-md px-6 py-4 overflow-y-scroll ${
                 advancedMode ? "left-0" : "left-[-500px]"
               } bg-gray-100 transition-all`}
             >

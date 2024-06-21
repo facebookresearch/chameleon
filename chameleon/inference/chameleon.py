@@ -81,9 +81,9 @@ class Options:
     extra_eos_tokens: list[int | str] = field(default_factory=lambda: ["<racm3:break>"])
 
     def __post_init__(self):
-        if self.txt:
+        if self.txt is True:
             self.txt = Options.Text()
-        if self.img:
+        if self.img is True:
             self.img = Options.Image()
 
 

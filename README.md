@@ -3,7 +3,7 @@
 **[Paper](//arxiv.org/abs/2405.09818) | [Blog](//ai.meta.com/blog/meta-fair-research-new-releases/) | [Model Checkpoint Download](//ai.meta.com/resources/models-and-libraries/chameleon-downloads) | [HuggingFace](//huggingface.co/facebook/chameleon)**
 
 This repository contains artifacts for the Meta Chameleon model from FAIR, Meta AI. In this repository is:
-- [Standalone Inference Code](./chameleon/inference) — a fast inference implementation for running [model checkpoints](//ai.meta.com/resources/models-and-libraries/chameleon-downloads)
+- [Standalone Inference Code](./chameleon/inference) — a fast GPU-based inference implementation for running [model checkpoints](//ai.meta.com/resources/models-and-libraries/chameleon-downloads)
 - [Input-Output Viewing](./chameleon/viewer) — a harness for richly viewing multimodal model inputs and outputs with a browser-based tool
 - [Evaluation Prompts](./data) — mixed-modal and text-only prompts for human evaluation
 
@@ -15,10 +15,10 @@ Running constituent components for inference and the input-output viewer current
 
 First, pip install this repository:
 ```sh
-pip install git+https://github.com/facebookresearch/chameleon.git
+pip install -U git+https://github.com/facebookresearch/chameleon.git
 ```
 
-If you want access to the full visualizer, you'll need to clone this repository, then pip install:
+Alternatively, if you want access to the full visualizer, you'll need to clone this repository (instead of installing), then pip install from the repository root:
 ```sh
 git clone https://github.com/facebookresearch/chameleon.git
 cd chameleon
@@ -54,7 +54,7 @@ This runs the 7B parameter model. To run the 30B model, use the following comman
 python -m chameleon.miniviewer --model-size 30b
 ```
 
-You can open the miniviewer at http://localhost:5000/
+You can open the miniviewer at `http://localhost:5000/`.
 
 ### License
 

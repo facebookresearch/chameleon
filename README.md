@@ -1,6 +1,6 @@
 # Meta Chameleon
 
-**[Paper](//arxiv.org/abs/2405.09818) | [Blog](//ai.meta.com/blog/meta-fair-research-new-releases/) | [Model Checkpoint Download](//ai.meta.com/resources/models-and-libraries/chameleon-downloads) | [HuggingFace](//huggingface.co/facebook/chameleon)**
+**[Paper](//arxiv.org/abs/2405.09818) | [Blog](//ai.meta.com/blog/meta-fair-research-new-releases/) | [Model Checkpoint Download](//ai.meta.com/resources/models-and-libraries/chameleon-downloads) | [HuggingFace](//huggingface.co/collections/facebook/chameleon-668da9663f80d483b4c61f58)**
 
 This repository contains artifacts for the Meta Chameleon model from FAIR, Meta AI. In this repository is:
 - [Standalone Inference Code](./chameleon/inference) — a fast GPU-based inference implementation for running [model checkpoints](//ai.meta.com/resources/models-and-libraries/chameleon-downloads)

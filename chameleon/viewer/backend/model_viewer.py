@@ -34,7 +34,8 @@ def create_chameleon_generator(cfg: DictConfig):
             world_size=world_size,
             master_address=cfg.distributed.master_address,
             master_port=cfg.distributed.master_port,
-            redis_port=cfg.redis_port,
+            redis_host=cfg.redis.host,
+            redis_port=cfg.redis.port,
         )
     else:
         generator = ChameleonLocalGenerator(
@@ -58,7 +59,8 @@ def main(cfg: DictConfig) -> None:
         cfg.host,
         cfg.port,
         debug=cfg.debug,
-        redis_port=cfg.redis_port,
+        redis_host=cfg.redis.host,
+        redis_port=cfg.redis.port,
     )
 
 

@@ -94,6 +94,7 @@ COORDINATOR = "coordinator"
 def web_app(
     generator: AbstractMultimodalGenerator,
     debug: bool = True,
+    redis_host: str = "redis",
     redis_port: int | None = None,
 ) -> FastAPI:
     app = FastAPI(debug=debug)
@@ -102,7 +103,7 @@ def web_app(
         redis_lock = None
         queue_counter = None
     else:
-        redis_client = async_redis.Redis.from_url(f"redis://redis:{redis_port}")
+        redis_client = async_redis.Redis.from_url(f"redis://{redis_host}:{redis_port}")
         redis_lock = async_redis.lock.Lock(redis_client, COORDINATOR)
         queue_counter = AsyncRedisCounter(redis_client, "count_pending")
     hostname = socket.gethostname()
@@ -292,9 +293,10 @@ def serve(
     host: str,
     port: int,
     debug: bool = True,
+    redis_host: str = "redis",
     redis_port: int | None = None,
 ) -> None:
-    app = web_app(model, debug=debug, redis_port=redis_port)
+    app = web_app(model, debug=debug, redis_host=redis_host, redis_port=redis_port)
     # TODO: convert this to a subprocess call so enable more
     # uvicorn features like multiple workers
     uvicorn.run(app, host=host, port=port)

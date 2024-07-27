@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 
 /outputs
+/chameleon.egg-info

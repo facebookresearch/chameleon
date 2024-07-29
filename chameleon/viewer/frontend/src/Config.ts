@@ -6,6 +6,6 @@
 */
 
 export const Config = {
-  ws_address: "ws://0.0.0.0:7102",
+  ws_address: import.meta.env.VITE_WS_ADDRESS || "ws://0.0.0.0:7102",
   default_seed: 97,
 };
